@@ -219,24 +219,22 @@ function generateMappingSetup2Xml(dlcNameUpper, mappingBaseNameLower, mappingBas
 }
 
 /**
- * Sanitizes a string to be used as a valid identifier (lowercase, alphanumeric, hyphens, underscores).
- * Converts to lowercase and replaces non-alphanumeric (except hyphens) characters with underscores.
- * This is a flexible sanitization that allows hyphens if present in the original folder name,
- * but replaces spaces and other problematic characters.
+ * Sanitizes a string to be used as a valid identifier (lowercase, alphanumeric, no hyphens).
+ * Converts to lowercase and removes non-alphanumeric characters.
  * @param {string} name The string to sanitize.
  * @returns {string} The sanitized string.
  */
 function sanitizeIdentifier(name) {
-    return name.toLowerCase().replace(/[^a-z0-9-]/g, '_');
+    return name.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
 /**
- * Converts a string to uppercase and replaces hyphens with underscores, suitable for level hashes and changeSetNames.
+ * Converts a string to uppercase, removing non-alphanumeric characters.
  * @param {string} name The string to convert.
  * @returns {string} The converted string.
  */
 function toUpperSnakeCase(name) {
-    return name.toUpperCase().replace(/-/g, '_');
+    return name.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 }
 
 /**
@@ -297,13 +295,13 @@ async function main() {
 
         // Derive names from the folder name, allowing flexibility
         const folderName = path.basename(currentMappingInputPath);
-        const mappingBaseNameLower = sanitizeIdentifier(folderName); // e.g., my-awesome-map
-        const mappingBaseNameUpper = toUpperSnakeCase(folderName); // e.g., MY_AWESOME_MAP
+        const mappingBaseNameLower = sanitizeIdentifier(folderName); // e.g., myawesomemap
+        const mappingBaseNameUpper = toUpperSnakeCase(folderName); // e.g., MYAWESOMEMAP
 
-        const dlcNameLower = `dlc_${mappingBaseNameLower}`; // e.g., dlc_my-awesome-map
-        const dlcNameUpper = `dlc_${mappingBaseNameUpper}`; // e.g., dlc_MY_AWESOME_MAP (used in content.xml filesToEnable)
+        const dlcNameLower = `dlc_${mappingBaseNameLower}`; // e.g., dlc_myawesomemap
+        const dlcNameUpper = `dlc_${mappingBaseNameUpper}`; // e.g., dlc_MYAWESOMEMAP (used in content.xml filesToEnable)
 
-        const levelNameHash = `${mappingBaseNameUpper}_L11`; // e.g., MY_AWESOME_MAP_L11 (or use MO_JIM_L11 if it's a fixed value)
+        const levelNameHash = `${mappingBaseNameUpper}_L11`; // e.g., MYAWESOMEMAP_L11 (or use MO_JIM_L11 if it's a fixed value)
         // For now, let's stick to MO_JIM_L11 as per the example for genericConditions and associatedMap
         // If the user wants this to be dynamic based on folder name, they'll need to specify.
         const fixedLevelNameHash = 'MO_JIM_L11';
@@ -416,4 +414,3 @@ async function main() {
 
 // Execute the main function
 main().catch(console.error);
-
